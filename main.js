@@ -398,21 +398,14 @@ function physics(deltaTime) {
           obj.y -= obj.velocity.getYComponent() * deltaTime;
           
           //Check collisions
-          /*for (var d in objects) {
+          for (var d in objects) {
             var obj2 = objects[d];
-            if (obj2.type === "default" && obj2.mask !== null) {
-              for (p = 0; p < obj2.mask.points.length; p++) {
-                for (p2 = 0; p2 < obj.mask.points.length; p2++) {
-                  var m2 = (obj2.mask.points[p][1] - obj2.mask.points[(p+1)%obj2.mask.points.length][1]) / (obj2.mask.points[p][0] - obj2.mask.points[(p+1)%obj2.mask.points.length][0]);
-                  var b2 = m2*(obj2.mask.points[p][0]) + obj2.mask.points[p][1] + obj2.x + obj2.y;
-                  var m1 = (obj.mask.points[p2][1] - obj.mask.points[(p2+1)%obj.mask.points.length][1]) / (obj.mask.points[p2][0] - obj.mask.points[(p2+1)%obj.mask.points.length][0]);
-                  var b1 = m1*(obj.mask.points[p2][0]) + obj.mask.points[p2][1] + obj.x + obj.y;
-                  var point = getIntersection(m1,b1,m2,b2);
-                  
-                }
+            for (l = 0; l < obj.mask.points.length; l++) {
+              if (inOrOut(obj.mask.points[l], obj2.mask)) {
+                
               }
             }
-          }*/
+          }
           
           obj.KE += .5 * obj.mass * Math.pow(obj.velocity.magnitude / METRE, 2);
           
@@ -467,6 +460,37 @@ function physics(deltaTime) {
 
 function getIntersection(m1, b1, m2, b2) {
   return [(b2-b1)/(m1-m2), ((b2-b1)/(m1-m2))*m1 + b1];
+}
+
+function inOrOut(point,mask){
+ var intersectionCount = 0;
+  for(var ii = 0; ii<mask.points.length;ii++){  
+		var right = [0,point[1]];
+    var nextii = (ii+1)%mask.points.length;
+  	var line = getLine(mask.points[ii], mask.points[nextii]);
+    var interse = [];
+    if(line[0]==0)
+    	continue;
+    console.log(line[0]);
+    if(line[0] == Number.NEGATIVE_INFINITY ||line[0] == Number.POSITIVE_INFINITY){
+      interse = [mask.points[ii][0],point[1]];
+    } else {
+    	interse = getIntersection(right[0],right[1],line[0],line[1]);
+    }
+    var maskp1 = mask.points[ii][1] >= interse[1];
+    var maskp2 = mask.points[nextii][1] >= interse[1];
+
+    if(interse[0]>=point[0]&&(maskp1 ^ maskp2)){
+      intersectionCount++;
+    }
+  }
+  return !(intersectionCount % 2 == 0);
+}
+       
+function getLine(p1, p2) {
+  var m2 = (p2[1] - p1[1]) / (p2[0] - p1[0]);
+  var b2 = p1[1] - m2*(p1[0]);
+  return [m2,b2];
 }
 
 function shortestAngularDistance(a1, a2) {
