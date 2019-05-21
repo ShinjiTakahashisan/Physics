@@ -462,6 +462,40 @@ function getIntersection(m1, b1, m2, b2) {
   return [(b2-b1)/(m1-m2), ((b2-b1)/(m1-m2))*m1 + b1];
 }
 
+function collisionCheck(obj,obj2) {
+  if (obj2.type === "default") {
+    var check = false;
+    for (l = 0; l < obj.mask.points.length; l++) {
+      var intersectionCount = 0;
+      var point = obj.mask.points[l];
+      var mask = obj2.mask;
+      for(var ii = 0; ii<mask.points.length;ii++){
+    		var right = [0,point[1]+obj.y];
+        var nextii = (ii+1)%mask.points.length;
+      	var line = getLine([mask.points[ii][0]+obj2.x, mask.points[ii][1]+obj2.y], [mask.points[nextii][0]+obj2.x,mask.points[nextii][1]+obj2.y]);
+        var interse = [];
+        if(line[0]==0)
+        	continue;
+        if(line[0] == Number.NEGATIVE_INFINITY ||line[0] == Number.POSITIVE_INFINITY){
+          interse = [mask.points[ii][0]+obj2.x,point[1]+obj.y];
+        } else {
+        	interse = getIntersection(right[0],right[1],line[0],line[1]);
+        }
+        var maskp1 = mask.points[ii][1]+obj2.y >= interse[1];
+        var maskp2 = mask.points[nextii][1]+obj2.y >= interse[1];
+    
+        if(interse[0]>=point[0]+obj.x&&(maskp1 ^ maskp2)){
+          intersectionCount++;
+        }
+      }
+      if (intersectionCount & 2 !== 0) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 function inOrOut(point,mask){
  var intersectionCount = 0;
   for(var ii = 0; ii<mask.points.length;ii++){  
