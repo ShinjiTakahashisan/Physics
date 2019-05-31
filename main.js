@@ -480,7 +480,7 @@ function init() {
   velInput.style = "border:none;width:4em;background-color:rgba(20,20,20,.5);color:white;padding:8px;font-family:Ubuntu Mono;outline:none";
   velInput.addEventListener('keyup', function(e) {
     if (e.keyCode === 13) {
-      targetObject.velocity.magnitude = parseInt(this.value) * METRE;
+      targetObject.velocity.magnitude = parseFloat(this.value) * METRE;
       targetObject.velocity.updateSprite(10);
     }
   });
